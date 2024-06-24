@@ -9,6 +9,7 @@ import { DataTable } from '@/components/data-table'
 
 const data: Payment[] = [
   { id: '728ed52f', amount: 100, status: 'pending', email: 'm@example.com' },
+  { id: '728ed52f2', amount: 102, status: 'pending', email: 'm2@example.com' },
 ]
 
 const AccountsPage = () => {
@@ -25,7 +26,13 @@ const AccountsPage = () => {
           </Button>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={data} />
+          <DataTable
+            columns={columns}
+            data={data}
+            filterKey='email'
+            onDelete={() => {}}
+            disabled={false}
+          />
         </CardContent>
       </Card>
     </div>
