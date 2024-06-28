@@ -8,11 +8,12 @@ import {
 } from '../../../components/ui/sheet'
 import { AccountForm } from './account-form'
 import { z } from 'zod'
-import { useCreateAccount } from '../api/use-create-account'
 import { useOpenAccount } from '../hooks/use-open-account'
 import { useGetAccount } from '../api/use-get-account'
-import { DefaultDeserializer } from 'v8'
 import { Loader2 } from 'lucide-react'
+import { useEditAccount } from '../api/use-edit-account'
+import { useDeleteAccount } from '../api/use-delete-account'
+import { useConfim } from '@/hooks/use-confirm'
 
 const formSchema = insertAccountSchema.pick({
   name: true,
@@ -22,17 +23,37 @@ type FormValues = z.infer<typeof formSchema>
 
 export const EditAccountSheet = () => {
   const { isOpen, onClose, id } = useOpenAccount()
+
+  const [ConfirmDialog, confirm] = useConfim(
+    'Are you sure?',
+    'You are about to delete this account.'
+  )
+
   const accountQuery = useGetAccount(id)
-  const mutation = useCreateAccount()
+  const editMutation = useEditAccount(id)
+  const deleteMutation = useDeleteAccount(id)
 
   const isLoading = accountQuery.isLoading
 
+  const isPending = editMutation.isPending || deleteMutation.isPending
+
   const onSubmit = (values: FormValues) => {
-    mutation.mutate(values, {
+    editMutation.mutate(values, {
       onSuccess: () => {
         onClose()
       },
     })
+  }
+
+  const onDelete = async () => {
+    const ok = await confirm()
+    if (ok) {
+      deleteMutation.mutate(undefined, {
+        onSuccess: () => {
+          onClose()
+        },
+      })
+    }
   }
 
   const defaultValues = accountQuery.data
@@ -44,13 +65,12 @@ export const EditAccountSheet = () => {
       }
   return (
     <>
+      <ConfirmDialog />
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className='space-y-4'>
           <SheetHeader>
             <SheetTitle>Edit Account</SheetTitle>
-            <SheetDescription>
-              Edit an existing account.
-            </SheetDescription>
+            <SheetDescription>Edit an existing account.</SheetDescription>
           </SheetHeader>
           {isLoading ? (
             <div className='absolute inset-0 flex items-center justify-center'>
@@ -60,8 +80,9 @@ export const EditAccountSheet = () => {
             <AccountForm
               id={id}
               onSubmit={onSubmit}
-              disabled={mutation.isPending}
+              disabled={isPending}
               defaultValues={defaultValues}
+              onDelete={onDelete}
             />
           )}
         </SheetContent>
