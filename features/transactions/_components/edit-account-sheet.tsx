@@ -6,13 +6,13 @@ import {
   SheetTitle,
   SheetHeader,
 } from '../../../components/ui/sheet'
-import { AccountForm } from './account-form'
+import { TransactionForm } from './transaction-form'
 import { z } from 'zod'
 import { useOpenAccount } from '../hooks/use-open-account'
 import { useGetTransaction } from '../api/use-get-transaction'
 import { Loader2 } from 'lucide-react'
 import { useEditTransaction } from '../api/use-edit-transaction'
-import { useDeleteAccount } from '../api/use-delete-transaction'
+import {useDeleteTransaction } from '../api/use-delete-transaction'
 import { useConfim } from '@/hooks/use-confirm'
 
 const formSchema = insertAccountSchema.pick({
@@ -31,7 +31,7 @@ export const EditAccountSheet = () => {
 
   const accountQuery = useGetTransaction(id)
   const editMutation = useEditTransaction(id)
-  const deleteMutation = useDeleteAccount(id)
+  const deleteMutation = useDeleteTransaction(id)
 
   const isLoading = accountQuery.isLoading
 
