@@ -63,7 +63,7 @@ export const AmountInput = ({
         value={value}
         decimalsLimit={2}
         decimalScale={2}
-        decimalSeparator='.'
+        decimalSeparator=','
         onValueChange={onChange}
         disabled={disabled}
       />
