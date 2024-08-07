@@ -9,8 +9,35 @@ import { DataTable } from '@/components/data-table'
 import { useGetTransactions } from '@/features/transactions/api/use-get-transactions'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useBulkDeleteTransactions } from '@/features/transactions/api/use-bulk-delete-transactions'
+import { useState } from 'react'
+import { UploadButton } from './upload-button'
+import { ImportCard } from './import-card'
+
+enum VARIANTS {
+  LIST = 'LIST',
+  IMPORT = 'IMPORT',
+}
+
+const INITIAL_IMPORT_RESULTS = {
+  data: [],
+  errors: [],
+  meta: {},
+}
 
 const TransactionsPage = () => {
+  const [variant, setVariant] = useState<VARIANTS>(VARIANTS.LIST)
+  const [importResults, setImportResults] = useState(INITIAL_IMPORT_RESULTS)
+
+  const onUpload = (result: typeof INITIAL_IMPORT_RESULTS) => {
+    setImportResults(result)
+    setVariant(VARIANTS.IMPORT)
+  }
+
+  const onCancelImport = () => {
+    setImportResults(INITIAL_IMPORT_RESULTS)
+    setVariant(VARIANTS.LIST)
+  }
+
   const newTransaction = useNewTransaction()
   const deleteTransaction = useBulkDeleteTransactions()
   const transactionsQuery = useGetTransactions()
@@ -35,15 +62,32 @@ const TransactionsPage = () => {
     )
   }
 
+  if (variant === VARIANTS.IMPORT) {
+    return (
+      <>
+        <ImportCard
+          data={importResults.data}
+          onCancel={onCancelImport}
+          onSubmit={() => {}}
+        />
+      </>
+    )
+  }
+
   return (
     <div className='max-w-screen-2xl mx-auto w-full pb-10 -mt-24'>
       <Card className='border-none drop-shadow-sm'>
         <CardHeader className='gap-y-2 lg:flex-row lg:items-center lg:justify-between'>
-          <CardTitle className='text-xl line-clamp-1'>Transactions history</CardTitle>
-          <Button onClick={newTransaction.onOpen} size='sm'>
-            <Plus className='size-4 mr-2' />
-            Add new
-          </Button>
+          <CardTitle className='text-xl line-clamp-1'>
+            Transactions history
+          </CardTitle>
+          <div className='flex items-center gap-x-2 flex-col lg:flex-row gap-y-2'>
+            <Button onClick={newTransaction.onOpen} size='sm' className='w-full lg:w-auto'>
+              <Plus className='size-4 mr-2' />
+              Add new
+            </Button>
+            <UploadButton onUpload={onUpload} />
+          </div>
         </CardHeader>
         <CardContent>
           <DataTable
