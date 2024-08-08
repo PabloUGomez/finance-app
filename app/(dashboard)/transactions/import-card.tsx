@@ -1,8 +1,5 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus } from 'lucide-react'
-import { UploadButton } from './upload-button'
-import { DataTable } from '@/components/data-table'
 import { useState } from 'react'
 import { ImportTable } from './import-table'
 import { convertAmountToMiliunits } from '@/lib/utils'
@@ -72,7 +69,6 @@ export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
         })
         .filter((row) => row.length > 0),
     }
-
     const arrayOfData = mappedData.body.map((row) => {
       return row.reduce((acc: any, cell, index) => {
         const header = mappedData.headers[index]
@@ -82,14 +78,11 @@ export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
         return acc
       }, {})
     })
-
-    const formatedData = arrayOfData.map((row) => {
-      return {
-        ...row,
-        amount: convertAmountToMiliunits(parseFloat(row.amount)),
-        date: format(parse(row.date, dateFormat, new Date()), outputFormat),
-      }
-    })
+    const formatedData = arrayOfData.map((row) => ({
+      ...row,
+      amount: convertAmountToMiliunits(parseFloat(row.amount)),
+      date: format(parse(row.date, dateFormat, new Date()), outputFormat),
+    }))
     onSubmit(formatedData)
   }
   return (
